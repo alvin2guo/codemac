@@ -223,6 +223,7 @@ MCD_TOKEN=&lt;你的 MCP Token&gt; node src/server.js</pre>
 </div>
 
 <script>window.__GITHUB_REPO__ = "https://github.com/alvin2guo/codemac";</script>
+<script>window.CODEMAC_REPO = "https://github.com/alvin2guo/codemac";</script>
 <script type="module">
 import { collectGitHubData } from './src/github.js';
 import { computeReport, renderText } from './src/report.js';
@@ -491,9 +492,9 @@ $('copyText').addEventListener('click', async () => {
   setTimeout(() => { btn.textContent = '📋 复制文字报告'; }, 1500);
 });
 
-// 仓库地址（部署时由脚本注入）
-if (window.https://github.com/alvin2guo/codemac) {
-  $('starLink').href = window.https://github.com/alvin2guo/codemac;
+// 仓库地址（部署时由脚本注入 window.CODEMAC_REPO）
+if (window.CODEMAC_REPO) {
+  $('starLink').href = window.CODEMAC_REPO;
 }
 </script>
 </body>
