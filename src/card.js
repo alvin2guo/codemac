@@ -99,7 +99,7 @@ export function renderCardSvg(report) {
 
   <!-- 趣味点评 -->
   <text x="400" y="1024" font-size="20" fill="#6B5B3E" text-anchor="middle">${funText}</text>
-  <text x="400" y="1054" font-size="17" fill="#A99B7F" text-anchor="middle">热量核算 ${compact(Math.round(kcal))} 千卡 ≈ 慢跑 ${compact(runHours.toFixed(1))} 小时（娱乐换算）</text>
-  <text x="400" y="1078" font-size="14" fill="#C0B595" text-anchor="middle">GitHub 公开数据（近期 300 事件 + 累计）× 麦当劳 MCP（mcp.mcd.cn） · 纯娱乐 · CodeMac 参赛作品</text>
+  <text x="400" y="1050" font-size="17" fill="#A99B7F" text-anchor="middle">热量核算 ${compact(Math.round(kcal))} 千卡 ≈ 慢跑 ${compact(runHours.toFixed(1))} 小时（娱乐换算）</text>
+  <text x="400" y="1074" font-size="14" fill="#C0B595" text-anchor="middle">GitHub 公开数据（近期 300 事件 + 累计）× 麦当劳 MCP（mcp.mcd.cn） · 纯娱乐 · CodeMac 参赛作品</text>
 </svg>`;
 }
