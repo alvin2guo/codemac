@@ -73,19 +73,55 @@ index.html         在线演示页（Canvas 渲染 + PNG/SVG 下载 + 复制文�
 
 ---
 
-## 第三阶段：交付与报名（用户提供凭证后执行）
+## 第三阶段：MCP 真实联调（用户提供 Token 后执行）
 
 **用户提示词 3：**
 
-> （用户提供 GitHub PAT 与 MCP Token，授权全自动交付）
+> MCP token：1KXbJCL1efvyWwWKNTlou4j36CLhnNog
 
-**WorkBuddy 待执行动作：**
+**WorkBuddy 联调过程（全部自主完成）：**
 
-1. `scripts/snapshot.js` 真实调用 `mcp.mcd.cn` 生成 `data/mcd-snapshot.json`（原始返回存档 `docs/mcp-raw/`）；
-2. 创建公开仓库并推送（注入真实仓库地址到 README / 演示页）；
-3. 开启 GitHub Pages（root 目录），验证在线演示可访问；
-4. 按官方 Issue 模板提交报名申请（标题与正文间无换行、项目地址不用 Markdown 链接），确认系统回复「报名成功」；
-5. 产出各平台推广物料（掘金 / V2EX / linux.do / 知乎 / 腾讯云社区 / 微信群）。
+1. 首轮快照生成后发现异常：价格字段与内置兜底值完全一致 → 判断 MCP 返回未被真正解析；
+2. 逐工具 dump 原始返回，发现麦当劳 MCP 的文本是「Markdown 包装」格式，真实 JSON 载荷在
+   `## Original Response` 段落之后，且部分工具（campaign-calendar）直接返回 Markdown、营养数据是
+   `[160]{列名}:` 自定义表格字符串 → 重写 `src/mcp.js` 增加 `extractJson()`（三级提取策略），
+   重写 `src/menu-data.js` 的营养表与活动日历解析器；
+3. 发现 `query-meals` 需要门店编码且受营业时间限制（23:00 后多数门店返回「已过营业时间」）→
+   实现门店发现逻辑：多城市搜索 → 优先当前营业/24 小时门店 → 自动降级到店场景重试；
+4. 最终通过 **24 小时得来速门店（北京健德桥，storeCode 1950176）** 拿到真实菜单：
+   巨无霸 ¥26.5、麦乐鸡 ¥15、薯条 ¥14.5、可乐 ¥9.5、玉米杯 ¥13、苹果片 ¥7，
+   `calculate-price` 试算确认应付价；营养数据 160 项全量解析（巨无霸 513 千卡）；
+5. 净化数据管线：从快照脚本中移除 `query-my-account` 等个人账户 Tool，优惠券存档剔除签名图片 URL，
+   确保仓库零个人数据。
+
+## 第四阶段：部署与报名（用户提供 PAT 后执行）
+
+**用户提示词 4：**
+
+> Github的token：ghp_xxx
+
+**部署结果：**
+
+| 项 | 结果 |
+|---|---|
+| 仓库 | https://github.com/alvin2guo/codemac （public，创建于 2026-10-24，符合规则时间窗） |
+| 演示站 | https://alvin2guo.github.io/codemac/ （GitHub Pages，root 部署） |
+| 报名 Issue | https://github.com/M-China/mcd-developer-innovation-challenge/issues/1308 |
+| topics | mcdonalds / mcp / big-mac / github / 1024 / workbuddy / codemac |
+
+**部署中自主发现并修复的问题：**
+
+1. 沙箱网络阻断 git 协议直连 github.com（api.github.com 可达）→ 改用 GitHub Git Data API
+   （blob → tree → commit → ref）完成 22 个文件的单次提交推送；
+2. 空仓库 git 数据库 409 → 先用 Contents API 初始化 README 再走 Git Data API；
+3. **部署脚本占位符注入缺陷**：`replaceAll('__GITHUB_REPO__', url)` 把 JS 标识符
+   `window.__GITHUB_REPO__` 一并替换成 URL，导致线上页面 SyntaxError、卡片无法生成 →
+   改用 `window.CODEMAC_REPO` 配置变量 + 脚本标签字面量注入，修复后无头 Chrome 实测通过；
+4. README 卡片截图原为兜底价格版本 → 用线上真实数据卡片替换并推送。
+
+**最终验证（无头 Chrome CDP 实测线上地址）：**
+输入 alvin2guo → 卡片完整渲染：巨无霸等价比 2.057、餐饮账单 ¥55、麦门见习段位、
+「码龄 10.2 年，胃和代码一样稳」趣味点评，全部数值来自真实 MCP 数据。
 
 ---
 
@@ -93,5 +129,8 @@ index.html         在线演示页（Canvas 渲染 + PNG/SVG 下载 + 复制文�
 
 - 100% 的代码、文档、参赛文件由 WorkBuddy 生成，人工零行代码；
 - 赛事规则解析、榜单数据分析、赛道拥挤度判断由 WorkBuddy 完成；
-- 架构决策表（上表）为 WorkBuddy 提出并执行；
-- 自测发现的问题（服务器入口、静态目录、数字尺度）由 WorkBuddy 自主定位并修复。
+- 架构决策表（第二阶段）为 WorkBuddy 提出并执行；
+- MCP 响应格式逆向（Markdown 包装 / 自定义表格）、门店发现与降级策略由 WorkBuddy 自主设计；
+- 自测与线上验证发现的问题（服务器入口、静态目录、数字尺度、占位符注入、git 协议阻断）
+  全部由 WorkBuddy 自主定位并修复。
+
