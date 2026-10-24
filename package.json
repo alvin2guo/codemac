@@ -1,0 +1,26 @@
+{
+  "name": "codemac",
+  "version": "1.0.0",
+  "description": "CodeMac · 代码汉堡报告 —— 输入 GitHub 用户名，看看你的代码生涯值多少个巨无霸。基于麦当劳中国 MCP（mcp.mcd.cn）实时取价。",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "codemac": "src/cli.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "snapshot": "node scripts/snapshot.js",
+    "serve": "node src/server.js"
+  },
+  "keywords": [
+    "mcdonalds",
+    "mcp",
+    "github",
+    "big-mac",
+    "1024",
+    "workbuddy"
+  ]
+}

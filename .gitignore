@@ -1,0 +1,6 @@
+node_modules/
+*.log
+codemac-*.svg
+codemac-*.png
+.env
+.DS_Store

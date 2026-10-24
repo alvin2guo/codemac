@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeMac · 代码汉堡报告 —— 你的 GitHub 值多少个巨无霸？</title>
+<meta name="description" content="输入 GitHub 用户名，把你的 commit、Star、PR 换算成巨无霸、麦乐鸡和薯条。基于麦当劳中国 MCP 实时取价，1024 程序员节参赛作品。">
+<style>
+  :root {
+    --red: #DA291C;
+    --yellow: #FFC72C;
+    --cream: #FFF9EC;
+    --ink: #1F1F1F;
+    --gray: #8A8A8A;
+    --card-border: #F0E3C8;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', -apple-system, sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px 80px; }
+
+  /* ---------- 顶部 ---------- */
+  header {
+    background: var(--red);
+    color: #fff;
+    padding: 18px 0;
+  }
+  header .wrap { padding-bottom: 0; display: flex; align-items: center; justify-content: space-between; }
+  .logo { font-size: 26px; font-weight: 900; letter-spacing: 1px; }
+  .logo span { color: var(--yellow); }
+  .nav a {
+    color: #FFE9C9; text-decoration: none; margin-left: 18px; font-size: 14px;
+  }
+  .nav a:hover { color: #fff; }
+  .nav a.cta {
+    background: var(--yellow); color: #3A2A00; font-weight: 700;
+    padding: 6px 14px; border-radius: 999px;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero { text-align: center; padding: 56px 0 36px; }
+  .hero h1 { font-size: 42px; font-weight: 900; line-height: 1.25; }
+  .hero h1 em { color: var(--red); font-style: normal; }
+  .hero p { margin-top: 14px; color: #6B5B3E; font-size: 17px; }
+  .hero .badges { margin-top: 18px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .hero .badges span {
+    background: #fff; border: 1px solid var(--card-border); color: #6B5B3E;
+    font-size: 12.5px; padding: 4px 12px; border-radius: 999px;
+  }
+
+  /* ---------- 输入区 ---------- */
+  .input-bar {
+    display: flex; gap: 10px; justify-content: center; margin: 30px auto 8px;
+    max-width: 620px;
+  }
+  .input-bar input {
+    flex: 1; height: 52px; border: 2px solid #EAD9B8; border-radius: 12px;
+    padding: 0 18px; font-size: 16px; background: #fff; outline: none;
+    transition: border-color .15s;
+  }
+  .input-bar input:focus { border-color: var(--red); }
+  .input-bar button {
+    height: 52px; padding: 0 28px; border: none; border-radius: 12px;
+    background: var(--red); color: #fff; font-size: 16px; font-weight: 700;
+    cursor: pointer; transition: transform .1s, box-shadow .1s;
+  }
+  .input-bar button:hover { box-shadow: 0 6px 16px rgba(218,41,28,.25); transform: translateY(-1px); }
+  .input-bar button:disabled { opacity: .6; cursor: wait; transform: none; }
+  .samples { text-align: center; color: var(--gray); font-size: 13px; margin-bottom: 26px; }
+  .samples a { color: var(--red); cursor: pointer; text-decoration: underline; margin: 0 4px; }
+
+  .msg { text-align: center; color: var(--red); font-size: 14px; min-height: 20px; margin-bottom: 10px; }
+
+  /* ---------- 卡片 ---------- */
+  .stage { display: none; text-align: center; }
+  .stage.show { display: block; }
+  .card-holder {
+    background: #fff; border: 1px solid var(--card-border); border-radius: 18px;
+    padding: 18px; display: inline-block; box-shadow: 0 12px 40px rgba(90,70,20,.08);
+  .card-holder canvas { width: 100%; max-width: 420px; height: auto; border-radius: 10px; display: block; }
+  .actions { margin-top: 18px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .actions button, .actions a {
+    border: 1.5px solid #EAD9B8; background: #fff; color: var(--ink);
+    padding: 10px 22px; border-radius: 10px; font-size: 14.5px; font-weight: 600;
+    cursor: pointer; text-decoration: none;
+  }
+  .actions button.primary, .actions a.primary {
+    background: var(--yellow); border-color: var(--yellow); color: #3A2A00;
+  }
+  .data-source { margin-top: 14px; color: var(--gray); font-size: 12.5px; }
+
+  /* ---------- 说明区 ---------- */
+  section.info { margin-top: 70px; }
+  section.info h2 { font-size: 26px; font-weight: 900; text-align: center; margin-bottom: 28px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .step {
+    background: #fff; border: 1px solid var(--card-border); border-radius: 14px; padding: 22px;
+  }
+  .step b { display: block; font-size: 16px; margin-bottom: 8px; }
+  .step p { color: #6B5B3E; font-size: 14px; line-height: 1.7; }
+  .step .num {
+    display: inline-flex; width: 26px; height: 26px; border-radius: 8px;
+    background: var(--red); color: #fff; font-weight: 800; font-size: 14px;
+    align-items: center; justify-content: center; margin-bottom: 10px;
+  }
+  pre {
+    background: #2B2B2B; color: #FFE9C9; border-radius: 12px; padding: 18px 20px;
+    font-size: 13.5px; overflow-x: auto; line-height: 1.7; margin-top: 14px;
+    font-family: 'Cascadia Code', Consolas, 'Courier New', monospace;
+  }
+  pre .c { color: #9C8B6A; }
+  footer {
+    margin-top: 70px; text-align: center; color: #A99B7F; font-size: 12.5px; line-height: 2;
+  }
+  footer a { color: #B8860B; }
+  @media (max-width: 760px) {
+    .grid3 { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 30px; }
+    header .wrap { flex-direction: column; gap: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="logo">CODE<span>MAC</span> · 代码汉堡报告</div>
+    <nav class="nav">
+      <a href="#how">玩法</a>
+      <a href="#cli">命令行</a>
+      <a class="cta" id="starLink" href="https://github.com/M-China/mcd-developer-innovation-challenge" target="_blank" rel="noopener">⭐ Star 本项目</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <h1>你的 GitHub 代码生涯<br>值 <em>多少个巨无霸</em>？</h1>
+    <p>输入任意 GitHub 用户名，把 commit、Star、PR、Issue 换算成巨无霸、麦乐鸡和薯条——价格来自麦当劳中国官方 MCP 实时数据。</p>
+    <div class="badges">
+      <span>🍔 麦当劳 MCP 实时取价</span>
+      <span>📊 GitHub 公开数据</span>
+      <span>⚡ 零配置，打开即玩</span>
+      <span>🎖️ 1024 程序员节参赛作品</span>
+    </div>
+  </div>
+
+  <div class="input-bar">
+    <input id="loginInput" type="text" placeholder="输入 GitHub 用户名，例如 torvalds" autocomplete="off" spellcheck="false">
+    <button id="goBtn">生成报告 🍔</button>
+  </div>
+  <div class="samples">
+    试试：
+    <a data-login="torvalds">torvalds</a> ·
+    <a data-login="yyx990803">yyx990803</a> ·
+    <a data-login="sindresorhus">sindresorhus</a> ·
+    <a data-login="ruanyf">ruanyf</a>
+  </div>
+  <div class="msg" id="msg"></div>
+
+  <div class="stage" id="stage">
+    <div class="card-holder">
+      <canvas id="card" width="1600" height="2160"></canvas>
+    </div>
+    <div class="actions">
+      <button class="primary" id="dlPng">📥 下载卡片 PNG</button>
+      <button id="dlSvg">📥 下载 SVG</button>
+      <button id="copyText">📋 复制文字报告</button>
+    </div>
+    <div class="data-source" id="dataSource"></div>
+  </div>
+
+  <section class="info" id="how">
+    <h2>怎么玩？</h2>
+    <div class="grid3">
+      <div class="step">
+        <span class="num">1</span>
+        <b>输入 GitHub 用户名</b>
+        <p>只读取公开信息：资料、公开事件流、公开仓库。不需要登录，不需要授权，不存储任何数据。</p>
+      </div>
+      <div class="step">
+        <span class="num">2</span>
+        <b>代码 → 餐品换算</b>
+        <p>commit 变巨无霸、Star 变麦乐鸡、PR 变薯条、Issue 变可乐、Review 变玉米杯、粉丝变苹果片。</p>
+      </div>
+      <div class="step">
+        <span class="num">3</span>
+        <b>MCP 实时计价</b>
+        <p>调用麦当劳中国 MCP（mcp.mcd.cn）获取巨无霸等餐品实时价格，算出你的「巨无霸等价比」和餐饮账单，生成分享卡片。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="info" id="cli">
+    <h2>命令行版本（实时 MCP 模式）</h2>
+    <div class="grid3">
+      <div class="step" style="grid-column: 1 / -1;">
+        <b>用自己的 MCP Token，实时取价生成卡片：</b>
+        <pre><span class="c"># 1. 克隆仓库（零依赖，Node.js >= 18 即可）</span>
+git clone https://github.com/https://github.com/alvin2guo/codemac.git &amp;&amp; cd codemac
+
+<span class="c"># 2. 申请麦当劳 MCP Token：https://open.mcd.cn/mcp （手机号登录 → 控制台 → 激活）</span>
+export MCD_TOKEN=&lt;你的 MCP Token&gt;
+
+<span class="c"># 3. 生成报告与分享卡片</span>
+node src/cli.js torvalds --out my-card.svg
+
+<span class="c"># 启动本地演示站（实时模式）</span>
+MCD_TOKEN=&lt;你的 MCP Token&gt; node src/server.js</pre>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>数据来源：<a href="https://docs.github.com/rest" target="_blank" rel="noopener">GitHub 公开 API</a> × <a href="https://github.com/M-China/mcd-mcp-server" target="_blank" rel="noopener">麦当劳中国 MCP</a>｜餐品价格以麦当劳官方渠道实时结果为准</p>
+    <p>纯娱乐换算，不构成营养或投资建议｜CodeMac 为麦当劳程序员创意开发大赛参赛作品，非麦当劳官方产品</p>
+  </footer>
+</div>
+
+<script>window.__GITHUB_REPO__ = "https://github.com/alvin2guo/codemac";</script>
+<script type="module">
+import { collectGitHubData } from './src/github.js';
+import { computeReport, renderText } from './src/report.js';
+import { renderCardSvg } from './src/card.js';
+
+const $ = (id) => document.getElementById(id);
+const input = $('loginInput'), goBtn = $('goBtn'), msg = $('msg'), stage = $('stage');
+let currentReport = null;
+let snapshot = null;
+
+// 读取 MCP 数据快照（预生成）；本地代理模式下优先用实时数据
+async function loadMenu() {
+  try {
+    const live = await fetch('/api/menu');
+    if (live.ok) return { menu: await live.json(), live: true };
+  } catch { /* 静态托管，无代理 */ }
+  try {
+    const r = await fetch('./data/mcd-snapshot.json');
+    if (r.ok) snapshot = await r.json();
+  } catch { /* 忽略 */ }
+  return { menu: snapshot ?? fallbackMenu(), live: false };
+}
+
+function fallbackMenu() {
+  return {
+    source: 'fallback', generatedAt: new Date().toISOString(),
+    items: {
+      bigMac: { name: '巨无霸', price: 23.0, kcal: 530 },
+      mcNuggets: { name: '麦乐鸡(4块)', price: 12.5, kcal: 190 },
+      fries: { name: '薯条(中)', price: 11.0, kcal: 320 },
+      coke: { name: '可乐(中)', price: 10.0, kcal: 150 },
+      corn: { name: '玉米杯(小)', price: 8.5, kcal: 90 },
+      apple: { name: '苹果片', price: 7.0, kcal: 50 },
+    },
+    bigMacCouponPrice: null, campaigns: [],
+  };
+}
+
+const FONT = "'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif";
+const SCALE = 2;
+
+/** 大数字压缩显示：147672 → "14.8 万" */
+function compact(n) {
+  const v = Number(n ?? 0);
+  if (Math.abs(v) >= 1e8) return `${(v / 1e8).toFixed(1)} 亿`;
+  if (Math.abs(v) >= 1e4) return `${(v / 1e4).toFixed(1)} 万`;
+  return v.toLocaleString('zh-CN');
+}
+function compactMoney(n) {
+  const v = Number(n ?? 0);
+  if (Math.abs(v) >= 1e8) return `¥${(v / 1e8).toFixed(1)} 亿`;
+  if (Math.abs(v) >= 1e4) return `¥${(v / 1e4).toFixed(1)} 万`;
+  return `¥${v.toFixed(0)}`;
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, r);
+}
+
+async function loadAvatar(url) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
+}
+
+/** 在 canvas 上绘制报告卡片（1600×2160，与 SVG 版同布局） */
+async function drawCard(canvas, report) {
+  canvas.width = 800 * SCALE;
+  canvas.height = 1080 * SCALE;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(SCALE, SCALE);
+  ctx.textBaseline = 'alphabetic';
+  const { user, rank, foods, bill, burgerEquivalent, kcal, runHours, funLines, source, generatedAt, effectivePrice } = report;
+  const dateStr = new Date(generatedAt).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+  const fmt = (n) => Number(n ?? 0).toLocaleString('zh-CN');
+
+  // 背景
+  ctx.fillStyle = '#FFF9EC';
+  ctx.fillRect(0, 0, 800, 1080);
+
+  // 顶部红带
+  ctx.fillStyle = '#DA291C';
+  ctx.fillRect(0, 0, 800, 128);
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = `800 40px ${FONT}`;
+  ctx.fillText('CODEMAC', 56, 62);
+  ctx.font = `22px ${FONT}`;
+  ctx.fillStyle = '#FFD9A8';
+  ctx.fillText('代码汉堡报告 · Code-as-a-Burger', 56, 100);
+  ctx.font = `22px ${FONT}`;
+  ctx.fillStyle = '#FFFFFF';
+  ctx.textAlign = 'right';
+  ctx.fillText(dateStr, 744, 62);
+  ctx.font = `18px ${FONT}`;
+  ctx.fillStyle = '#FFD9A8';
+  ctx.fillText(source === 'live' ? 'MCP 实时取价' : 'MCP 数据快照', 744, 100);
+  ctx.textAlign = 'left';
+
+  // 头像
+  const avatar = await loadAvatar(user.avatarUrl);
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(128, 196, 46, 0, Math.PI * 2);
+  ctx.clip();
+  if (avatar) {
+    const s = Math.max(92 / avatar.width, 92 / avatar.height);
+    const w = avatar.width * s, h = avatar.height * s;
+    ctx.drawImage(avatar, 82 + (92 - w) / 2, 150 + (92 - h) / 2, w, h);
+  } else {
+    ctx.fillStyle = '#EAD9B8';
+    ctx.fillRect(82, 150, 92, 92);
+  }
+  ctx.restore();
+  ctx.beginPath();
+  ctx.arc(128, 196, 46, 0, Math.PI * 2);
+  ctx.strokeStyle = '#FFC72C';
+  ctx.lineWidth = 4;
+  ctx.stroke();
+
+  // 用户信息
+  ctx.fillStyle = '#1F1F1F';
+  ctx.font = `800 34px ${FONT}`;
+  ctx.fillText(user.name || user.login, 200, 186);
+  ctx.font = `22px ${FONT}`;
+  ctx.fillStyle = '#8A8A8A';
+  ctx.fillText(`@${user.login}${user.location ? ' · ' + user.location : ''}`, 200, 220);
+  ctx.font = `18px ${FONT}`;
+  ctx.fillStyle = '#B8860B';
+  ctx.fillText(`${user.topLanguage} · 码龄 ${user.accountYears.toFixed(1)} 年`, 200, 250);
+
+  // 段位徽章
+  ctx.fillStyle = '#FFC72C';
+  roundRect(ctx, 560, 168, 184, 56, 28);
+  ctx.fill();
+  ctx.fillStyle = '#3A2A00';
+  ctx.font = `800 26px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.fillText(rank.title, 652, 206);
+  ctx.textAlign = 'left';
+
+  // 核心数字
+  ctx.font = `26px ${FONT}`;
+  ctx.fillStyle = '#8A8A8A';
+  ctx.textAlign = 'center';
+  ctx.fillText('你的 GitHub 代码生涯，价值', 400, 372);
+  ctx.font = `900 96px ${FONT}`;
+  ctx.fillStyle = '#DA291C';
+  ctx.fillText(compact(burgerEquivalent), 400, 456);
+  ctx.font = `700 30px ${FONT}`;
+  ctx.fillText('个巨无霸（按 MCP 券后价折算）', 400, 498);
+  ctx.textAlign = 'left';
+
+  // 明细
+  ctx.font = `700 22px ${FONT}`;
+  ctx.fillStyle = '#1F1F1F';
+  ctx.fillText('代码餐饮明细', 72, 528);
+  foods.forEach((f, i) => {
+    const y = 560 + i * 56;
+    ctx.font = `30px ${FONT}`;
+    ctx.fillText(f.emoji, 72, y);
+    ctx.font = `600 24px ${FONT}`;
+    ctx.fillStyle = '#2B2B2B';
+    ctx.fillText(f.name, 118, y);
+    ctx.font = `22px ${FONT}`;
+    ctx.fillStyle = '#8A8A8A';
+    ctx.fillText(`× ${compact(f.count)}`, 300, y);
+    ctx.font = `24px ${FONT}`;
+    ctx.fillStyle = '#2B2B2B';
+    ctx.textAlign = 'right';
+    ctx.fillText(compactMoney(f.total), 728, y);
+    ctx.textAlign = 'left';
+  });
+
+  // 账单
+  ctx.fillStyle = '#FFFFFF';
+  roundRect(ctx, 56, 916, 688, 76, 16);
+  ctx.fill();
+  ctx.strokeStyle = '#F0E3C8';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.font = `700 24px ${FONT}`;
+  ctx.fillStyle = '#1F1F1F';
+  ctx.fillText('餐饮账单', 88, 954);
+  ctx.font = `18px ${FONT}`;
+  ctx.fillStyle = '#8A8A8A';
+  ctx.fillText(`巨无霸券后单价 ¥${effectivePrice.toFixed(2)}`, 88, 982);
+  ctx.font = `900 40px ${FONT}`;
+  ctx.fillStyle = '#DA291C';
+  ctx.textAlign = 'right';
+  ctx.fillText(compactMoney(bill), 712, 966);
+  ctx.textAlign = 'left';
+
+  // 趣味点评与脚注
+  ctx.font = `20px ${FONT}`;
+  ctx.fillStyle = '#6B5B3E';
+  ctx.textAlign = 'center';
+  ctx.fillText(funLines.slice(0, 2).join('　·　'), 400, 1028);
+  ctx.font = `17px ${FONT}`;
+  ctx.fillStyle = '#A99B7F';
+  ctx.fillText(`热量核算 ${compact(Math.round(kcal))} 千卡 ≈ 慢跑 ${compact(runHours.toFixed(1))} 小时（娱乐换算）`, 400, 1058);
+  ctx.font = `14px ${FONT}`;
+  ctx.fillStyle = '#C0B595';
+  ctx.fillText('GitHub 公开数据（近期 300 事件 + 累计）× 麦当劳 MCP（mcp.mcd.cn） · 纯娱乐 · CodeMac 参赛作品', 400, 1082);
+  ctx.textAlign = 'left';
+}
+
+async function generate(login) {
+  msg.textContent = '';
+  goBtn.disabled = true;
+  goBtn.textContent = '生成中…';
+  try {
+    const [{ menu, live }, ghData] = await Promise.all([loadMenu(), collectGitHubData(login.trim())]);
+    currentReport = computeReport(ghData, menu);
+    await drawCard($('card'), currentReport);
+    stage.classList.add('show');
+    $('dataSource').textContent =
+      `GitHub 公开数据 × 麦当劳 MCP ${live ? '实时' : '快照'}（快照时间：${new Date(menu.generatedAt).toLocaleString('zh-CN')}）`;
+    stage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } catch (err) {
+    msg.textContent = `😅 ${err.message}`;
+    stage.classList.remove('show');
+  } finally {
+    goBtn.disabled = false;
+    goBtn.textContent = '生成报告 🍔';
+  }
+}
+
+goBtn.addEventListener('click', () => generate(input.value));
+input.addEventListener('keydown', (e) => { if (e.key === 'Enter') generate(input.value); });
+document.querySelectorAll('.samples a').forEach((a) =>
+  a.addEventListener('click', () => { input.value = a.dataset.login; generate(a.dataset.login); }),
+);
+
+$('dlPng').addEventListener('click', () => {
+  $('card').toBlob((blob) => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `codemac-${currentReport.user.login}.png`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }, 'image/png');
+});
+
+$('dlSvg').addEventListener('click', () => {
+  const blob = new Blob([renderCardSvg(currentReport)], { type: 'image/svg+xml' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `codemac-${currentReport.user.login}.svg`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+$('copyText').addEventListener('click', async () => {
+  const btn = $('copyText');
+  try {
+    await navigator.clipboard.writeText(renderText(currentReport));
+    btn.textContent = '✅ 已复制';
+  } catch {
+    btn.textContent = '❌ 复制失败';
+  }
+  setTimeout(() => { btn.textContent = '📋 复制文字报告'; }, 1500);
+});
+
+// 仓库地址（部署时由脚本注入）
+if (window.https://github.com/alvin2guo/codemac) {
+  $('starLink').href = window.https://github.com/alvin2guo/codemac;
+}
+</script>
+</body>
+</html>

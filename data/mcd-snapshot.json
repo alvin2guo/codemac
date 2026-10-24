@@ -1,0 +1,92 @@
+{
+  "source": "live",
+  "generatedAt": "2026-10-24T23:22:51.611",
+  "note": "麦当劳 MCP（mcp.mcd.cn）实时数据",
+  "items": {
+    "bigMac": {
+      "name": "巨无霸",
+      "price": 26.5,
+      "kcal": 513
+    },
+    "mcNuggets": {
+      "name": "麦乐鸡",
+      "price": 15,
+      "kcal": 213
+    },
+    "fries": {
+      "name": "薯条",
+      "price": 14.5,
+      "kcal": 289
+    },
+    "coke": {
+      "name": "可乐",
+      "price": 9.5,
+      "kcal": 147
+    },
+    "corn": {
+      "name": "玉米杯",
+      "price": 13,
+      "kcal": 87
+    },
+    "apple": {
+      "name": "苹果片",
+      "price": 7,
+      "kcal": 32
+    }
+  },
+  "bigMacCouponPrice": 26.5,
+  "campaigns": [
+    {
+      "title": "麦当劳「我就喜欢」限定丝巾正式开售🔥"
+    },
+    {
+      "title": "韩式风味蘸酱上新❤️就「酱」心有所「薯」"
+    },
+    {
+      "title": "参与麦金喜抽奖，🉐[积分霸王餐]"
+    },
+    {
+      "title": "麦当劳 X PEACEMINUSONE"
+    },
+    {
+      "title": "麦当劳联动G-DRAGON"
+    },
+    {
+      "title": "🫐一口爆汁！蓝莓爆爆珠麦旋风上新"
+    },
+    {
+      "title": "早餐爆款回归，快来pick你的厚松饼堡！📣"
+    },
+    {
+      "title": "🍫麦咖啡13.9r浓浓黑巧来啦！"
+    },
+    {
+      "title": "麦咖啡一早现磨🥳元气早餐震撼来袭！"
+    },
+    {
+      "title": "🩶灰白撞色，灰焰圆筒酷爽登场"
+    },
+    {
+      "title": "学生专属！49元150天麦金学期卡💳"
+    },
+    {
+      "title": "过家家派对上线，快来一起解锁梦想职业"
+    },
+    {
+      "title": "“韩”风刮到了四件套~龙焰鸡腿堡来袭！"
+    },
+    {
+      "title": "乐享90分钟高质量亲子时间"
+    },
+    {
+      "title": "快来一起参加麦麦派对吧！"
+    }
+  ],
+  "store": {
+    "name": "北京健德桥得来速餐厅",
+    "storeCode": "1950176"
+  },
+  "contest": "麦当劳程序员创意开发大赛",
+  "endpoint": "https://mcp.mcd.cn",
+  "disclaimer": "数据由麦当劳中国官方 MCP 实时抓取，仅供 CodeMac 演示与娱乐换算使用。"
+}
